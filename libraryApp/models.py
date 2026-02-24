@@ -4,10 +4,7 @@ from django.utils import timezone
 from isbn_field import ISBNField
 
 class Book(models.Model):
-    """
-    作品情報 (Book)
-    ISBNを主キーとして管理します。
-    """
+
     # ER図: isbn_id (PK)
     isbn = ISBNField()
     title = models.CharField(max_length=255, verbose_name="タイトル")

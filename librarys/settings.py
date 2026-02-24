@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'libraryApp',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'debug_toolbar',           # Debug Toolbar
     # ソーシャルログインで使いたいソーシャルプロパイダを指定してください。複数指定することも可
     'allauth.socialaccount.providers.google',
-    'isbn-field',
+    'isbn_field',
 ]
 
 # allauth用の設定（サイト識別用）
@@ -75,7 +76,7 @@ INTERNAL_IPS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [BASE_DIR /'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,3 +137,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

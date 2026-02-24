@@ -1,0 +1,45 @@
+/* ベースファイル */
+.title_book{
+    text-align: center;
+}
+
+
+/* ---蔵書登録 */
+
+.container{
+    text-align: center;
+    margin:  0 auto;
+}
+
+
+.render{
+    position: absolute; 
+    top: 25%; left: 10%; width: 80%; height: 50%; 
+    border: 2px dashed rgb(167, 167, 167); 
+    pointer-events: none;
+}
+
+.input-section{
+    margin-top: 20px;
+    padding: 15px; 
+    border-top: 1px solid #ccc;
+}
+
+#book_entry{
+    display: block; 
+    font-weight: bold;
+}
+
+.book_contents{
+    width: 100%; 
+    padding: 8px;
+    border:   1px solid  #ccc;
+    border-radius: 4px
+}
+
+.message{
+    padding: 10px; 
+    margin-bottom: 10px; 
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
