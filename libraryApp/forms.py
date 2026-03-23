@@ -1,39 +1,67 @@
 from django import forms
+from django.db.models import Q
 from .models import Book
 
-class BookForm(forms.ModelForm):
-    class Meta:
-        model = Book
-        fields = ['isbn', 'title', 'writer']  # ここを writer に変更！
-        # フォームの見た目を整えるためのウィジェット設定（任意）
-        widgets = {
-            'isbn': forms.TextInput(attrs={'class': 'form-control', 'id': 'manual-isbn'}),
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'writer': forms.TextInput(attrs={'class': 'form-control'}),
-        }
+class BookSearchForm(forms.Form):
+    """本棚から本を検索するためのフォーム"""
 
-    # --- ISBNのバリデーション ---
-    def clean_isbn(self):
-        # 送信されたデータからハイフンや空白を取り除く
-        isbn = self.cleaned_data.get('isbn').replace('-', '').replace(' ', '')
+    # ChoiceField -> MultipleChoiceField に変更
+    search_type = forms.MultipleChoiceField(
+        choices=[
+            ('title', 'タイトル'),
+            ('writer', '著者'),
+            ('isbn', 'ISBN'),
+        ],
+        required=False,
+        # 最初はすべてにチェックが入っている状態にする
+        initial=['title', 'writer', 'isbn'],
+        label='検索キーワード',
+        # CheckboxSelectMultiple に変更
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'search-checkbox-group'})
+    )
 
-        # 数字のみかチェック
-        if not isbn.isdigit():
-            raise forms.ValidationError("ISBNは数字のみで入力してください。")
+    query = forms.CharField(
+        max_length=255, 
+        required=False,
+        label='',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'ここに入力してください...',
+            'autocomplete': 'off'
+        })
+    )
 
-        # 桁数チェック（10桁または13桁）
-        if len(isbn) not in [10, 13]:
-            raise forms.ValidationError(f"ISBNの桁数が正しくありません（現在は{len(isbn)}桁です）。")
+    def search_books(self):
+        """フォームの入力内容に基づいてクエリセットをフィルタリングする"""
+        if not self.is_valid():
+            return Book.objects.all() # バリデーション失敗時は全件出すか、none()にする
 
-        # 日本の書籍の開始番号チェック（任意）
-        if len(isbn) == 13 and not (isbn.startswith('978') or isbn.startswith('979')):
-            raise forms.ValidationError("日本の書籍ISBN（978または979開始）を入力してください。")
+        query = self.cleaned_data.get('query', '').strip()
+        search_types = self.cleaned_data.get('search_type', [])
+        
+        # 基本のクエリセット
+        results = Book.objects.all()
 
-        return isbn
+        # キーワードがある場合のみ絞り込み
+        if query:
+            q_objects = Q()
+            
+            # 選択されたタイプ（リスト）をループして OR 条件を作成
+            if 'title' in search_types:
+                q_objects |= Q(title__icontains=query)
+            if 'writer' in search_types:
+                q_objects |= Q(writer__icontains=query)
+            if 'isbn' in search_types:
+                q_objects |= Q(isbn__icontains=query)
+            
+            # もしチェックボックスが一つも選ばれていなければ、デフォルトで全項目から検索
+            if not q_objects:
+                q_objects = Q(title__icontains=query) | Q(writer__icontains=query) | Q(isbn__icontains=query)
 
-    # --- タイトルのバリデーション ---
-    def clean_title(self):
-        title = self.cleaned_data.get('title')
-        if not title or title.strip() == "":
-            raise forms.ValidationError("タイトルは必須入力です。")
-        return title
+            results = results.filter(q_objects)
+        
+        return results.distinct() # 重複を防ぐために distinct() を推奨
+
+# --- BookForm は現状のままでも動作に問題ありませんが、
+# --- template側のISBN自動入力との兼ね合いで image_url などが
+# --- 含まれていない点だけ留意してください（登録時に直接createしているならOK）。

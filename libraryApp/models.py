@@ -6,11 +6,13 @@ from isbn_field import ISBNField
 class Book(models.Model):
 
     # ER図: isbn_id (PK)
-    isbn = ISBNField()
+    isbn = ISBNField(unique=True)
     title = models.CharField(max_length=255, verbose_name="タイトル")
     writer = models.CharField(max_length=255, verbose_name="著者")
-    publication_date = models.DateField(verbose_name="出版日")
-    image = models.ImageField(upload_to='book_images/', blank=True, null=True, verbose_name="表紙画像")
+    publication_date = models.DateField(blank=True, null=True, verbose_name="出版日")
+    # 画像URLは最大500文字まで保存可能
+    image_url = models.URLField(max_length=500, blank=True, null=True)
+    is_available = models.BooleanField(default=True, verbose_name="貸出可能フラグ")
 
     def __str__(self):
         return self.title
@@ -32,8 +34,8 @@ class BookItem(models.Model):
         related_name='items', 
         verbose_name="作品"
     )
-    purchase_date = models.DateField(verbose_name="購入日")
-    price = models.PositiveIntegerField(verbose_name="価格")
+    purchase_date = models.DateField(blank=True, null=True, verbose_name="購入日")
+    price = models.PositiveIntegerField(blank=True, null=True, verbose_name="価格")
     edition = models.CharField(max_length=50, blank=True, null=True, verbose_name="版数")
 
     def __str__(self):
@@ -61,7 +63,7 @@ class Lending(models.Model):
     )
     STATUS_CHOICES = [
         ('lending', '貸出中'),
-        ('returned', '返却済み'),
+        ('lend_ok', '貸出可能'),
     ]
     status = models.CharField(
         max_length=10, 
@@ -78,7 +80,7 @@ class Lending(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.book_item.book.title}"
+        return f"{self.user.username} - {self.book_item.book.title} (BookItem ID: {self.book_item.id})"
 
     class Meta:
         verbose_name = "貸出情報"
