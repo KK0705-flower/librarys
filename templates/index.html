@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="top-main-container">
+    
+    <h1 class="main-app-title">KaienBOOKサーチ</h1>
+    
+  {% if featured_book %}
+      {% if featured_book %}
+        {% if featured_book.image_url %}
+            <img src="{{ featured_book.image_url }}" alt="{{ featured_book.title }}" class="featured-book-img">
+        {% elif featured_book.image %}
+            <img src="{{ featured_book.image.url }}" alt="{{ featured_book.title }}" class="featured-book-img">
+        {% else %}
+            <p>画像URLが登録されていません</p>
+        {% endif %}
+    {% endif %}
+        <p class="featured-book-info">
+            {{ featured_book.title }}<br>
+            <span style="font-size: 1rem; font-weight: normal;">{{ featured_book.author }}</span>
+        </p>
+    {% else %}
+        <p class="featured-book-info">登録されている本がありません</p>
+    {% endif %}
+
+    <div class="top-action-group">
+        <a href="{% url 'book_register' %}" class="top-btn btn-brown">登録</a>
+        <a href="{% url 'book_search' %}" class="top-btn btn-red">貸出</a>
+    </div>
+
+    <a href="#" class="usage-guide-link">このアプリの使い方</a>
+
+</div>
+{% endblock %}

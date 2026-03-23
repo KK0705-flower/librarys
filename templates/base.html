@@ -1,16 +1,19 @@
-{% load static %}
-
-<!DOCTYPE html>
-<html>
+{% load static %}  <!DOCTYPE html>
+<html lang="ja">
 <head>
-    <title>KaienBookサーチ</title>
-        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KaienBOOKサーチ{% endblock %}</title>
+    
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    </head>
 <body>
-    <h2 class="title_book">KaienBookサーチ</h2>
-<div class="container">
-    {% block content %}
-    {% endblock %}
-</div>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
 </body>
 </html>

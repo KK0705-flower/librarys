@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}ご予約ありがとうございます{% endblock %}
+
+{% block content %}
+<div class="thanks-container">
+    <div class="thanks-card">
+        <h1 class="thanks-message">ありがとうございます！</h1>
+        <p class="instruction">貸出期間になったら、以下の本を本棚に取りに行ってください。</p>
+
+        <hr class="divider">
+
+        <div class="book-info-display">
+            <div class="book-image">
+                {% if book.image_url %}
+                    <img src="{{ book.image_url }}" alt="{{ book.title }}">
+                {% endif %}
+            </div>
+            
+            <div class="book-details">
+                <h2 class="book-title">{{ book.title }}</h2>
+                
+                <div class="info-item">
+                    <span class="label">貸出期間:</span>
+                    <span class="value">{{ lending.lending_date|date:"Y/m/d" }} ～ {{ lending.due_date|date:"Y/m/d" }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">本の場所:</span>
+                    <span class="value badge-location">{{ location }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="thanks-actions">
+            <a href="{% url 'book_search' %}" class="back-button">検索画面に戻る</a>
+        </div>
+    </div>
+    <div class="navigation" style="margin-top: 30px;">
+    <a href="{% url 'index' %}" class="btn-top">トップ画面に戻る</a>
+</div>
+</div>
+
+<style>
+    .thanks-container {
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    .thanks-card {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
+    .thanks-message { color: #6d544b; font-size: 1.8rem; margin-bottom: 10px; }
+    .instruction { color: #888; margin-bottom: 30px; }
+    .divider { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+    
+    .book-info-display {
+        display: flex;
+        gap: 20px;
+        text-align: left;
+        background: #fdfaf6;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    .book-image img { width: 100px; border-radius: 8px; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }
+    .book-title { font-size: 1.3rem; margin-top: 0; color: #333; }
+    
+    .info-item { margin-bottom: 10px; }
+    .label { font-weight: bold; color: #6d544b; display: block; font-size: 0.9rem; }
+    .value { font-size: 1.1rem; color: #555; }
+    .badge-location { color: #d7232f; font-weight: bold; }
+
+    .thanks-actions { margin-top: 30px; }
+    .back-button {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #6d544b;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        transition: opacity 0.3s;
+    }
+    .back-button:hover { opacity: 0.8; }
+</style>
+{% endblock %}
