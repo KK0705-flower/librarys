@@ -19,14 +19,16 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('libraryApp.urls')), # アプリ側のURLを読み込む
-path('api-auth/', include('rest_framework.urls')),   # API認証用
+    path('', include('libraryApp.urls')),
 ]
 
-# 以下の 3 行を追加
+# 👇 Debug Toolbar用の設定を追加
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
+    urlpatterns += [
+        path('__debug__/', include(debug_toolbar.urls)), # 🚨 これが足りないとエラーになります
+    ]
+    # 画像表示用の設定もここに繋げる
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
