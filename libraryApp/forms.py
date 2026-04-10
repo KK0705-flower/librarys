@@ -61,7 +61,3 @@ class BookSearchForm(forms.Form):
             results = results.filter(q_objects)
         
         return results.distinct() # 重複を防ぐために distinct() を推奨
-
-# --- BookForm は現状のままでも動作に問題ありませんが、
-# --- template側のISBN自動入力との兼ね合いで image_url などが
-# --- 含まれていない点だけ留意してください（登録時に直接createしているならOK）。

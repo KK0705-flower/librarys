@@ -1,18 +1,38 @@
+import re
 import requests
-import re
-import re
-from django.utils.dateparse import parse_date
+
 from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.utils import timezone
 from django.db import transaction
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
-from .models import Book, Lending, BookItem
-from .forms import BookSearchForm
-from django.core.files.base import ContentFile
+from django.contrib.auth.decorators import login_required
 
+# 自作のモデルやフォーム、フィルタ（同じアプリ内）
+from .models import Book, BookItem, Lending
+from .forms import BookSearchForm
+from .serializer import BookFilter  # ファイル名が filters.py の場合
+
+def book_list(request):
+    # 1. フィルタリングを実行
+    f = BookFilter(request.GET, queryset=Book.objects.all())
+    
+    # 2. 検索キーワード（query）がURLに含まれているか確認
+    query_text = request.GET.get('query')
+    
+    # 3. 検索中かつ、結果が1件も存在しないか判定
+    # f.qs.exists() はデータがあれば True、なければ False を返します
+    no_results = query_text is not None and not f.qs.exists()
+
+    context = {
+        'filter': f,
+        'query_text': query_text,
+        'no_results': no_results,
+    }
+    return render(request, 'libraryApp/book_search.html', context)
 
 def index(request):
     # .order_by('?') でランダムに並び替え、最初の1件 (.first()) を取得
@@ -52,6 +72,7 @@ def book_register(request):
     """APIから本を取得し、DBに登録するビュー"""
     book_data = None 
     isbn = request.GET.get('isbn')
+    # APIキーの取得（設定がなければSECRET_KEYを代用する既存ロジックを維持）
     api_key = getattr(settings, 'GOOGLE_BOOKS_API_KEY', settings.SECRET_KEY)
 
     # 1. 【GET処理】検索
@@ -85,53 +106,50 @@ def book_register(request):
         publication_date_raw = request.POST.get('book-publication-date', '').strip()
         image_url = request.POST.get('image_url', '').strip()
 
-        # 🚨 【バリデーション1】必須チェック
         if not isbn_val or not title:
             messages.error(request, "ISBNとタイトルは必須項目です。")
             return redirect(f"{request.path}?isbn={isbn_val}")
 
-        # 🚨 【バリデーション2】重複チェック
-       # 🚨 【バリデーション2】重複チェック
         if Book.objects.filter(isbn=isbn_val).exists():
             messages.warning(request, f"「{title}」はすでに登録されています！")
-            # パラメータを付けずにリダイレクトすることで、初期の検索画面に戻る
             return redirect('book_register')
 
-        # 日付補正の強化
         formatted_date = None
         if publication_date_raw and publication_date_raw != "出版日不明":
-            # 数字とハイフン以外を除去
             temp_date = re.sub(r'[^0-9-]', '', publication_date_raw)
             if len(temp_date) == 4: temp_date += "-01-01"
             elif len(temp_date) == 7: temp_date += "-01"
-            
-            if parse_date(temp_date): # 正しい日付形式か検証
+            if parse_date(temp_date):
                 formatted_date = temp_date
 
         try:
             with transaction.atomic():
-                # 重複がないことが確定しているので .create で作成
                 book = Book.objects.create(
                     isbn=isbn_val,
-                    title=title[:200], # 文字数制限対策
+                    title=title[:200],
                     writer=writer[:200],
                     image_url=image_url,
                     publication_date=formatted_date
                 )
-
-                # BookItem（在庫・個体）の作成
                 BookItem.objects.get_or_create(book=book, defaults={'price': 0})
 
-                messages.success(request, f'「{title}」を本棚に登録しました！')
-                return redirect('index')
+                # ★ここを変更：完了画面(book_success)へリダイレクト
+                # 登録した本のタイトルを渡すためにセッションやクエリを使うこともできますが、
+                # シンプルに完了画面へ飛ばします。
+                return redirect('book_success')
 
         except Exception as e:
-            print(f"Error: {e}") # ログ出力
+            print(f"Error: {e}")
             messages.error(request, f"データベース登録中にエラーが発生しました。")
             return redirect(f"{request.path}?isbn={isbn_val}")
 
     return render(request, 'book_register.html', {'book': book_data, 'isbn': isbn})
 
+# ★追加：登録完了画面のビュー
+def book_success(request):
+    return render(request, 'book_success.html')
+
+@login_required
 @require_POST
 def book_lenderItem(request, isbn):
     """実際に貸し出し処理を行うビュー"""
@@ -163,7 +181,7 @@ def book_lenderItem(request, isbn):
 
         try:
             lending = Lending.objects.create(
-                user=request.user if request.user.is_authenticated else None,
+                user=request.user,
                 book_item=target_item,
                 status='lending',
                 lending_date=timezone.now(),

@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div style="text-align: center; background-color: #fdfaf5; border: 2px solid #000; border-radius: 20px; padding: 50px; max-width: 500px; width: 90%;">
+        
+        
+        <h1 style="color: #bfa07d; font-size: 1.8rem; font-weight: bold; margin-bottom: 10px;">
+            登録完了！
+        </h1>
+        
+        <p style="color: #666; margin-bottom: 40px; line-height: 1.6;">
+            続けて他の本を登録しますか？
+        </p>
+        
+        <a href="{% url 'book_register' %}" class="custom-search-button" style="text-decoration: none; display: block; margin-bottom: 20px;">
+            続けて登録する
+        </a>
+        
+        <a href="{% url 'index' %}" style="color: #000; text-decoration: underline; font-size: 0.9rem;">
+            トップ画面へ戻る
+        </a>
+    </div>
+</div>
+{% endblock %}

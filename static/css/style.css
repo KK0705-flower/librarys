@@ -1,45 +1,543 @@
-/* ベースファイル */
-.title_book{
+/* =========================================
+   1. ベーススタイル
+   ========================================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #EBE9E4;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+    color: #333;
+    /* 💡 画面全体で要素が左に寄るのを防ぐ */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ヘッダー：画面端までブラウン */
+.title_back {
+    width: 100%;
+    margin: 0;
+    padding: 20px 0;
+    background-color: #5d4037;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    /* 💡 上部ぴったりを保証 */
+    position: relative;
+    top: 0;
+}
+
+.title_book {
     text-align: center;
+    color: #ffffff;
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   2. レイアウトコンテナ (中央寄せ)
+   ========================================= */
+.library-search-wrapper, .container {
+    max-width: 500px; /* ★画像のように縦長で読みやすく制限 */
+    margin: 30px auto;
+    padding: 0 20px;
+    /* 💡 コンテナ自体の中身も中央に揃える */
+    width: 100%;
 }
 
 
-/* ---蔵書登録 */
+/* =========================================
+   7. Topページ専用 (クラス名の紐付け)
+   ========================================= */
 
-.container{
+/* 全体の配置を中央に */
+.top-main-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 0 20px;
     text-align: center;
-    margin:  0 auto;
+    width: 100%;
 }
 
-
-.render{
-    position: absolute; 
-    top: 25%; left: 10%; width: 80%; height: 50%; 
-    border: 2px dashed rgb(167, 167, 167); 
-    pointer-events: none;
+/* タイトル */
+.main-app-title {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
 }
 
-.input-section{
+/* 検索ボックス風のダミー */
+.mock-search-bar {
+    width: 100%;
+    padding: 18px;
+    border: 2px solid #000;
+    background-color: #fff;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+/* ★画像：あの変形角丸をTopにも適用 */
+.featured-book-img {
+    width: 100%;
+    height: auto;
+    border-radius: 50px 20px 80px 15px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+}
+
+/* 本のタイトル */
+.featured-book-info {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 35px;
+}
+
+/* ボタンの横並び設定 */
+.top-action-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* ボタン共通（メインボタンのスタイルを継承） */
+.top-btn {
+    flex: 1;
+    padding: 35px 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 登録ボタン：茶色 */
+.btn-brown {
+    background-color: #6d544b;
+    color: #f2e6ce;
+    box-shadow: 0 6px 0 #4e3b35;
+}
+
+/* 貸出ボタン：赤色 */
+.btn-red {
+    background-color: #d7232f;
+    color: #f2e6ce;
+    box-shadow: 0 6px 0 #b31d27;
+}
+
+.top-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #b31d27;
+}
+
+/* 使い方ボタン（ベージュ） */
+.usage-guide-link {
+    display: block;
+    width: 100%;
+    background-color: #bfa07d;
+    color: white;
+    padding: 15px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 10px;
+}
+/* =========================================
+   3. 検索フォーム (トップ画面の丸みを継承)
+   ========================================= */
+.search-form-section {
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.field-control input[type="text"] {
+    width: 100%;
+    padding: 18px 25px;
+    border: 2px solid #000; /* 黒い太枠でトップ画面を再現 */
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    background: #fff;
+    display: block;
+}
+
+.custom-search-button {
+    width: 100%;
+    background-color: #bfa07d; /* ベージュ系 */
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 50px; /* カプセル型 */
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+/* =========================================
+   4. 蔵書カード (画像デザインの再現)
+   ========================================= */
+.checkout-card {
+    background: transparent; /* 背景になじませる */
+    margin-bottom: 50px;
+    text-align: center;
+    width: 100%;
+    padding:20px
+}
+
+.book-title-display {
+    font-size: 1.8rem;
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* ★画像デザインの核：変形角丸 */
+.book-image-styled {
+    width: 100%;
+    height: auto;
+    border-radius: 50px 20px 80px 15px; /* トップ画面のあの形 */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    background-color: #fff;
+    display: block;
+    margin: 0 auto;
+}
+
+/* =========================================
+   5. 日付入力 (ブラウンスタイル)
+   ========================================= */
+.date-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.inline-date-picker {
+    padding: 12px;
+    border: 2px solid #d7ccc8;
+    border-radius: 12px;
+    color: #5d4037;
+    font-weight: bold;
+    background: #fff;
+}
+
+/* カレンダーアイコンをブラウンにする */
+.inline-date-picker::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%236d4c41" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
+}
+
+/* =========================================
+   6. メインボタン (縦長・インパクト重視)
+   ========================================= */
+.main-checkout-button {
+    width: 100%;
+    padding: 35px 20px; /* ★縦に大きくして押しやすく */
+    font-size: 2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    color: #f2e6ce;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* 貸出ボタン (赤) */
+.main-checkout-button {
+    background-color: #d7232f;
+    box-shadow: 0 6px 0 #b31d27;
+    margin-bottom: 10px;
+}
+
+/* 予約ボタン・登録ボタン (茶) */
+.main-checkout-button.reserve-mode, .btn-register {
+    background-color: #6d544b;
+    box-shadow: 0 6px 0 #4e3b35;
+}
+
+.main-checkout-button:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #b31d27;
+}
+
+.reserve-note {
+    font-size: 0.8rem;
+    color: #6d544b;
+    margin-top: 10px;
+}
+
+/* =========================================
+   9. 蔵書登録画面 (Custom Entry Style)
+   ========================================= */
+
+/* 全体を囲むコンテナ */
+.container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 0 20px;
+    background-color: #EBE9E4; /* 背景色統一 */
+}
+
+.container h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* --- 検索セクション --- */
+.search-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-section label {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+#manual-isbn {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #000; /* 黒枠で強調 */
+    border-radius: 12px;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+/* 検索ボタン（ベージュ） */
+#search-manual-btn {
+    width: 100%;
+    background-color: #bfa07d;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+/* --- 本のプレビュー画像 --- */
+.book-preview {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.book-preview img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    border-radius: 30px 10px 40px 10px; /* あの独特の角丸 */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+.book-results-container{
+    display: flex;
+    justify-content: center;
+}
+/* --- フォーム入力欄 --- */
+.registration-form div {
+    margin-bottom: 20px;
+}
+
+.registration-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.registration-form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    font-size: 1rem;
+}
+
+/* 読み取り専用(ISBN)は少し色を変える */
+input[readonly] {
+    background-color: #f0f0f0;
+    color: #666;
+}
+
+/* --- 登録ボタン (デカ茶色ボタン) --- */
+.entry-button {
+    width: 100%;
+    padding: 25px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    background-color: #6d544b; /* トップの登録ボタンと同じ茶色 */
+    color: #f2e6ce;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #4e3b35;
     margin-top: 20px;
-    padding: 15px; 
-    border-top: 1px solid #ccc;
+    transition: transform 0.1s;
 }
 
-#book_entry{
-    display: block; 
+.entry-button:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #4e3b35;
+}
+
+/* メッセージ（アラート） */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    text-align: center;
     font-weight: bold;
 }
+.alert-success { background-color: #d4edda; color: #155724; }
+.alert-error { background-color: #f8d7da; color: #721c24; }
 
-.book_contents{
-    width: 100%; 
-    padding: 8px;
-    border:   1px solid  #ccc;
-    border-radius: 4px
+.info-text {
+    text-align: center;
+    color: #6d544b;
+    line-height: 1.6;
 }
 
-.message{
-    padding: 10px; 
-    margin-bottom: 10px; 
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+/* メッセージボックスのスタイル */
+.messages {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+}
+
+.alert {
+    padding: 15px 20px;
+    background-color: #d4edda; /* 薄い緑（成功色） */
+    color: #155724;
+    border-radius: 50px; /* カプセル型 */
+    border: 2px solid #c3e6cb;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: fadeInDown 0.5s ease;
+}
+
+/* 上からふわっと出てくるアニメーション */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================
+   10. 検索結果なし画面 (No Results Style)
+   ========================================= */
+
+.no-results-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.no-results-card {
+    background-color: #fff; /* カードのように白く浮かせる */
+    padding: 30px 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    border: 1px solid #d7ccc8;
+}
+
+.no-results-message {
+    font-size: 1.0rem;
+    font-weight: bold;
+    color: #5d4037; /* ブラウン */
+    margin-bottom: 10px;
+}
+
+.no-results-sub {
+    font-size: 0.95rem;
+    color: #8d6e63;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+/* 「新しく登録する」リンクをボタン化 */
+.suggest-register-link {
+    display: block;
+    background-color: #bfa07d; /* 統一感のあるベージュ */
+    color: #fff !important;
+    padding: 18px;
+    border-radius: 50px; /* カプセル型 */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 0 #a68b6d;
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+.suggest-register-link:hover {
+    background-color: #a68b6d;
+}
+
+.suggest-register-link:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #a68b6d;
+}
+
+
+    .thanks-container {
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    .thanks-card {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
+
+
+    
+.restart-search-button {
+    width: 100%;
+    background-color: #bfa07d; /* ベージュ系 */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 50px; /* カプセル型 */
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 10px;
+    cursor: pointer;
 }
