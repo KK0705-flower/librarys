@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     # ソーシャルログインで使いたいソーシャルプロパイダを指定してください。複数指定することも可
     'allauth.socialaccount.providers.google',
     'isbn_field',
+     'django_filters',
 ]
 
 # allauth用の設定（サイト識別用）
