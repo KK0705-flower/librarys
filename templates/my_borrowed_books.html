@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h2>現在借りている本</h2>
+    
+    {% if borrowed_items %}
+        <div style="display: grid; gap: 20px;">
+            {% for item in borrowed_items %}
+            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
+                <div>
+                    <strong style="font-size: 1.1rem;">{{ item.book_item.book.title }}</strong><br>
+                    <span style="color: #666; font-size: 0.9rem;">返却期限: {{ item.due_date|date:"Y/m/d" }}</span>
+                </div>
+                
+                <form action="{% url 'return_book' item.id %}" method="POST" onsubmit="return confirm('返却しますか？');">
+                    {% csrf_token %}
+                    <button type="submit" class="restart-search-button" style="width: auto; padding: 8px 20px; font-size: 0.9rem;">
+                        返却する
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="text-align: center; color: #888; margin-top: 50px;">現在借りている本はありません。</p>
+        <div style="text-align: center;">
+        <a href="{% url 'book_search' %}" class="restart-search-button">
+            本を検索して借りる
+        </a>
+            <a href="{% url 'index' %}" class="restart-search-button">
+                TOPに戻る
+        </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

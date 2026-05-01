@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="padding: 20px; text-align: center;">
+    <h2>スキャン</h2>
+    
+    <div id="result" style="margin: 10px; padding: 10px; background: #e7f3ff; font-weight: bold;">
+    </div>
+
+    <div class="reader" style="position: relative; display: inline-block;">
+        <video id="js-video" autoplay playsinline muted style="width: 100%; max-width: 500px; border: 3px solid #333;"></video>
+        <div></div>
+    </div>
+    <div class="input-section" style="margin-top: 20px; padding: 15px; border-top: 1px solid #ccc;">
+    <div>
+          <p>ISBNコード：</p><input type="text" id="isbn-input" placeholder="978xxxxxxxxxx" >
+        <button id="search-btn">
+            検索
+        </button>
+    </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<script src="{% static 'js/skan.js' %}"></script>
+<script>
+document.getElementById('search-btn').addEventListener('click', () => {
+    const val = document.getElementById('search-btn').value;
+    if (val.length === 13) {
+        alert("ISBN: " + val + " で検索します");
+        // ここでViewに飛ばす処理を書く
+    } else {
+        alert("ISBNは13桁で入力してください（現在は" + val.length + "桁です）");
+    }
+});
+</script>
+{% endblock %}

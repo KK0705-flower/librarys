@@ -1,0 +1,4 @@
+{{ object.title }}
+{{ object.writer }}
+{{ object.isbn }}
+{% if object.publication_date %}{{ object.publication_date }}{% endif %}

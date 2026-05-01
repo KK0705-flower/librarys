@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}KaienBOOKサーチ{% endblock %}
+
+{% block content %}
+<div class="library-search-wrapper">
+    
+    <section class="search-form-section">
+        <form method="get" action="">
+            <div class="field-control">
+                <input type="text" name="query" value="{{ request.GET.query }}" placeholder="キーワードを入力..." aria-label="検索キーワード">
+            </div>
+
+          <div class="search-targets" style="margin-top: 15px; text-align: center;">
+            <label style="margin-right: 15px;">
+                <input type="checkbox" name="search_type" value="title" {% if 'title' in request.GET.getlist.search_type %}checked{% endif %}> タイトル
+            </label>
+             <label style="margin-right: 15px;">
+                <input type="checkbox" name="search_type" value="writer" {% if 'writer' in request.GET.getlist.search_type %}checked{% endif %}> 著者
+                </label>
+             <label>
+                 <input type="checkbox" name="search_type" value="isbn" {% if 'isbn' in request.GET.getlist.search_type %}checked{% endif %}> ISBN
+            </label>
+            </div>
+
+            <div class="search-mode" style="margin-top: 10px; text-align: center;">
+                {% for radio in form.search_mode %}
+                    <label style="margin-right: 10px;">{{ radio.tag }} {{ radio.choice_label }}</label>
+                 {% endfor %}
+            </div>
+            <button type="submit" class="custom-search-button">この条件で検索する</button>
+        </form>
+    </section>
+
+    <hr style="border: 1px solid #eee; margin: 40px 0;">
+
+    <div class="search-results-container">
+        {% if request.GET.query %}
+            {# --- A. 本が見つかった場合の表示 --- #}
+            {% if filter.qs.exists or search_results %}
+                <div class="book-results-container">
+                    {% for book in filter.qs|default:search_results %}
+                        <article class="checkout-card">
+                            <h1 class="book-title-display">{{ book.title }}</h1>
+                            <div class="image-container">
+                                {% if book.image_url %}
+                                    <img src="{{ book.image_url }}" alt="{{ book.title }}" class="book-image-styled">
+                                {% elif book.image %}
+                                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-image-styled">
+                                {% else %}
+                                    <div class="no-image-placeholder">No Image</div>
+                                {% endif %}
+                            </div>
+                            <div class="status-badge">
+                                {% if book.is_available %} 貸出可 {% else %} 貸出中 {% endif %}
+                            </div>
+                            <div class="action-section">
+                                {% if book.is_available %}
+                                    <form action="{% url 'book_lenderItem' book.isbn %}" method="POST" class="inline-form">
+                                        {% csrf_token %}
+                                        <div class="date-input-group">
+                                            <label class="date-label">返却予定日:</label>
+                                            <input type="date" name="due_date" min="{% now 'Y-m-d' %}" required class="inline-date-picker">
+                                        </div>
+                                        <button type="submit" class="main-checkout-button">この本を借りる</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{% url 'book_reserve' book.isbn %}" method="POST" class="inline-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="main-checkout-button reserve-mode">予約を入れる</button>
+                                        <p class="reserve-note">※返却され次第通知されます</p>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {# --- B. 1件も見つからなかった場合 --- #}
+                <div class="no-results-card" style="text-align: center; padding: 50px;">
+                    <p>「{{ request.GET.query }}」に該当する本は見つかりませんでした。</p>
+                    <a href="{% url 'book_register' %}?isbn={{ request.GET.query }}" class="suggest-register-link">この本を新しく登録する</a>
+                </div>
+            {% endif %}
+        {% else %}
+            {# --- C. 初期状態 --- #}
+            <p style="text-align: center; color: #999; margin-top: 50px;">蔵書を検索してください</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

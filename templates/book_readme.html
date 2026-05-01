@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}KaienBOOKサーチ{% endblock %}
+
+{% block content %}
+<div class="readme-container">
+    <h1>このアプリの使い方</h1>
+    <p>「KaienBOOKサーチ」はKaien社内にある蔵書を登録、貸出、返却が出来るアプリです。</p>
+    <div class="readme-background">
+         <hr>
+    <section class="feature">
+        <h2>TOP画面</h2>
+        <div class="feature-flex">
+        <img src="{% static 'image/top_image.jpg' %}" alt="トップ画面" class="top-image">
+       <ol>
+            <li>データベースに登録された本が表示されます。</li>
+            <li>蔵書を登録するページに移動します。</li>
+            <li>登録した蔵書を検索、貸出するページに移動します。</li>
+            <li>貸出中の蔵書を確認し、返却するページに移動します。</li>
+            <li>当ページに移動するリンクです。</li>
+        </ol>
+        </div>
+        <h2>蔵書の登録</h2>
+          <div class="feature-flex">
+        <img src="{% static 'image/book_register.jpg' %}" alt="蔵書の登録画面" class="feature-image">
+            <ol>
+                <li><strong>ISBNコードを入力：</strong> フォームの①の部分に、本の背面にある10桁または13桁のコードを入力します。</li>
+                <li><strong>情報を取得ボタンを押す：</strong> ②のボタンをクリックすると、本のタイトルや著者名が自動で取得されます。</li>
+            </ol>
+        </div>
+         <h2>蔵書の検索と貸出</h2>
+           <div class="feature-flex">
+        <img src="{% static 'image/book_search.jpg' %}" alt="蔵書の検索画面" class="search-image">
+            <ol>
+                <li><strong>キーワード入力：</strong> ①の検索ボックスに、探したい本のタイトルや著者名を入力します。</li>
+                <li><strong>検索条件の指定：</strong> ②でお好みの検索スタイルで本を検索します。</li>
+                <li><strong>検索実行：</strong> ③の「この条件で検索する」ボタンをクリックします。</li>
+                <li><strong>本の確認：</strong> ④に表示された検索結果から、借りたい本の情報を確認します。</li>
+                <li><strong>返却予定日の入力：</strong> ⑤のカレンダーマークをクリックして、本を返す日を指定します。</li>
+                <li><strong>貸出完了：</strong> ⑥の大きな赤い「この本を借りる」ボタンを押せば手続き完了です！</li>
+            </ol>
+            </div>
+        <h2>蔵書の返却</h2>
+         <div class="feature-flex">
+        <img src="{% static 'image/my_book.jpg' %}" alt="蔵書の返却画面" class="return-image">
+            <ol>
+                <li><strong>借りている本の確認：</strong> ①の「現在借りている本」の一覧から、返却したい本のタイトルと返却期限を確認します。</li>
+                <li><strong>返却処理：</strong> 本をもとの本棚に戻したら、本の右側にある「返却する」ボタンをクリックします。  <p style="color: rgb(109, 88, 88); font-size: 0.9em;">※期限を過ぎないようご注意ください！</p></li>
+                <li><strong>完了：</strong> 一覧から本が消えた場合、返却したことになります。</li>
+            </ol>
+            </div>
+    </section>
+    </div>
+</div>
+{% endblock %}

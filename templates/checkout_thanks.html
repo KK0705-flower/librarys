@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}ご予約ありがとうございます{% endblock %}
+
+{% block content %}
+<div class="thanks-container">
+    <div class="thanks-card">
+        <h1 class="thanks-message">ありがとうございます！</h1>
+        <p class="instruction">貸出期間になったら、以下の本を本棚に取りに行ってください。</p>
+
+        <hr class="divider">
+
+        <div class="book-info-display">
+            <div class="book-image">
+                {% if book.image_url %}
+                    <img src="{{ book.image_url }}" alt="{{ book.title }}">
+                {% endif %}
+            </div>
+            
+            <div class="book-details">
+                <h2 class="book-title">{{ book.title }}</h2>
+                
+                <div class="info-item">
+                    <span class="label">貸出期間:</span>
+                    <span class="value">{{ lending.lending_date|date:"Y/m/d" }} ～ {{ lending.due_date|date:"Y/m/d" }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">本の場所:</span>
+                    <span class="value badge-location">{{ location }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="thanks-actions">
+        <a href="{% url 'book_search' %}" class="restart-search-button" style="display: block; text-decoration: none;">
+        検索画面に戻る
+    </a>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'index' %}" style="color: #888; text-decoration: underline; font-size: 0.9rem; background: none; border: none; width: auto;">
+            トップ画面に戻る
+        </a>
+    </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
