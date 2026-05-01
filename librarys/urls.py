@@ -18,17 +18,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views # 
+from libraryApp.forms import LoginForm
+
 
 urlpatterns = [
+    path('', auth_views.LoginView.as_view(authentication_form=LoginForm), name='login'),
     path('admin/', admin.site.urls),
     path('', include('libraryApp.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 # 👇 Debug Toolbar用の設定を追加
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls)), # 🚨 これが足りないとエラーになります
+        path('__debug__/', include(debug_toolbar.urls)), 
     ]
     # 画像表示用の設定もここに繋げる
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
