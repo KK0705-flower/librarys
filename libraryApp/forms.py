@@ -1,9 +1,36 @@
 from django import forms
 from django.db.models import Q
 from .models import Book
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(label="メールアドレス", widget=forms.TextInput(attrs={'placeholder': 'メールアドレスを入力してください'}))
+    password = forms.CharField(label="パスワード", widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力してください'}))
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if not (username and password):
+            return super().clean()
+
+    
+        user_exists = User.objects.filter(username=username).exists()
+        if not user_exists:
+            self.add_error('username', "メールアドレスが間違っています。")
+            # 存在しない場合はここで終了（パスワードチェックに進まない）
+            return super().clean()
+
+        from django.contrib.auth import authenticate
+        user = authenticate(username=username, password=password)
+        if user is None:
+            self.add_error('password', "パスワードが間違っています。")
+
+        return super().clean()
 
 class BookSearchForm(forms.Form):
-    """本棚から本を検索するためのフォーム"""
+    """から本を検索するためのフォーム"""
 
     # ChoiceField -> MultipleChoiceField に変更
     search_type = forms.MultipleChoiceField(
@@ -17,7 +44,10 @@ class BookSearchForm(forms.Form):
         initial=['title', 'writer', 'isbn'],
         label='検索キーワード',
         # CheckboxSelectMultiple に変更
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'search-checkbox-group'})
+      widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'search-checkbox-group',
+            'checked': 'checked' 
+        })
     )
 
     query = forms.CharField(
@@ -30,34 +60,33 @@ class BookSearchForm(forms.Form):
             'autocomplete': 'off'
         })
     )
+    # 検索モードの選択肢を追加
+    search_mode = forms.ChoiceField(
+        choices=[
+            ('partial', '部分一致'),
+            ('exact', '完全一致'),
+        ],
+        initial='partial',
+        widget=forms.RadioSelect(attrs={'class': 'search-mode-radio'}),
+        label='検索モード'
+        )
 
     def search_books(self):
-        """フォームの入力内容に基づいてクエリセットをフィルタリングする"""
         if not self.is_valid():
-            return Book.objects.all() # バリデーション失敗時は全件出すか、none()にする
-
+            return Book.objects.all()    
         query = self.cleaned_data.get('query', '').strip()
-        search_types = self.cleaned_data.get('search_type', [])
-        
-        # 基本のクエリセット
-        results = Book.objects.all()
+    # URLにない場合は空リストではなく、全項目を入れるように明示する
+        search_types = self.cleaned_data.get('search_type') or ['title', 'writer', 'isbn']
+        search_mode = self.cleaned_data.get('search_mode', 'partial')
 
-        # キーワードがある場合のみ絞り込み
-        if query:
-            q_objects = Q()
-            
-            # 選択されたタイプ（リスト）をループして OR 条件を作成
-            if 'title' in search_types:
-                q_objects |= Q(title__icontains=query)
-            if 'writer' in search_types:
-                q_objects |= Q(writer__icontains=query)
-            if 'isbn' in search_types:
-                q_objects |= Q(isbn__icontains=query)
-            
-            # もしチェックボックスが一つも選ばれていなければ、デフォルトで全項目から検索
-            if not q_objects:
-                q_objects = Q(title__icontains=query) | Q(writer__icontains=query) | Q(isbn__icontains=query)
+        if not query:
+            return Book.objects.all()
 
-            results = results.filter(q_objects)
-        
-        return results.distinct() # 重複を防ぐために distinct() を推奨
+        q_objects = Q()
+        lookup_suffix = '__icontains' if search_mode == 'partial' else '__iexact'
+
+        for s_type in search_types:
+            lookup = f"{s_type}{lookup_suffix}"
+            q_objects |= Q(**{lookup: query})
+
+        return Book.objects.filter(q_objects).distinct()

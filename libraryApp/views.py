@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 
 # 自作のモデルやフォーム、フィルタ（同じアプリ内）
 from .models import Book, BookItem, Lending
@@ -68,6 +69,7 @@ def book_search(request):
     }
     return render(request, 'book_search.html', context)
 
+@staff_member_required  # 管理者（スタッフ）のみアクセス可能にする
 def book_register(request):
     """APIから本を取得し、DBに登録するビュー"""
     book_data = None 
@@ -179,6 +181,13 @@ def book_lenderItem(request, isbn):
 
         due_date_str = request.POST.get('due_date')
 
+        due_date = None
+        if due_date_str:
+            due_date = parse_date(due_date_str)
+            if due_date and due_date < timezone.now().date():
+                messages.error(request, "返却期限に過去の日付は設定できません。")
+                return redirect('book_search')
+
         try:
             lending = Lending.objects.create(
                 user=request.user,
@@ -205,3 +214,37 @@ def checkout_thanks(request, lending_id):
         'book': book,
         'location': location
     })
+
+@login_required
+def my_borrowed_books(request):
+    """ログイン中のユーザーが現在借りている本の一覧を表示する"""
+    # returned_date が空（None）のものが「現在借りている本」
+    borrowed_items = Lending.objects.filter(
+        user=request.user, 
+        returned_date__isnull=True
+    ).select_related('book_item__book')
+
+    return render(request, 'my_borrowed_books.html', {
+        'borrowed_items': borrowed_items
+    })
+
+@login_required
+@require_POST
+def return_book(request, lending_id):
+    """特定の貸出記録を「返却済み」にする"""
+    # セキュリティのため、自分の貸出データしか操作できないように user=request.user を指定
+    lending = get_object_or_404(Lending, id=lending_id, user=request.user)
+
+    with transaction.atomic():
+        # 返却日を現在時刻に設定
+        lending.returned_date = timezone.now()
+        lending.status = 'returned' 
+        lending.save()
+
+    messages.success(request, f"「{lending.book_item.book.title}」を返却しました。")
+    return redirect('my_borrowed_books')
+
+
+def book_readme(request):
+    """本の使い方や説明を表示するビュー"""
+    return render(request, 'book_readme.html')
