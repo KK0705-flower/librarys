@@ -26,6 +26,10 @@ PythonとDjangoの学習成果として、実用的なウェブアプリケー�
   <img src="static/image/ログイン画面.png" alt="ログイン画像" width="45%">
   <img src="static/image/借りている本.png" alt="貸出画面" width="45%">
 </p>
+<p align="center">
+  <img src="static/image/貸出画面.png" alt="貸出画面" width="45%">
+  <img src="static/image/返却画面.png" alt="返却画面" width="45%">
+</p>
 
 ### ER図
 <img src="ER図.png" alt="ER図" width="100%">
