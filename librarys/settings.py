@@ -15,7 +15,6 @@ import environ
 import os
 #from django.core.management.utils import get_random_secret_key
 #print(get_random_secret_key())
-DEBUG = env.bool('DEBUG', default=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # instanceを作成
@@ -35,7 +34,8 @@ if READ_ENV_FILE:
     env.read_env(env_file)
 
 
-DEBUG = False
+DEBUG = True
+
 #ALLOWED_HOSTS = ['.onrender.com']
 
 # Quick-start development settings - unsuitable for production
@@ -43,10 +43,6 @@ DEBUG = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -66,7 +62,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_framework',          # Django REST Framework
-    'debug_toolbar',           # Debug Toolbar
     # ソーシャルログインで使いたいソーシャルプロパイダを指定してください。複数指定することも可
     'allauth.socialaccount.providers.google',
     'isbn_field',
@@ -85,12 +80,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 既存のミドルウェア...
-    'debug_toolbar.middleware.DebugToolbarMiddleware', # 先頭に近い方が良い
-    'django.middleware.security.SecurityMiddleware',
     # ...
     "allauth.account.middleware.AccountMiddleware",    # allauth用
 ]
 
+
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 ROOT_URLCONF = 'librarys.urls'
 
 INTERNAL_IPS = [
@@ -177,3 +174,5 @@ LOGOUT_REDIRECT_URL = 'login'
 ##SESSION_COOKIE_SECURE = True          # セッションCookieをHTTPS専用にする
 ##CSRF_COOKIE_SECURE = True             # CSRF CookieもHTTPS専用にする
 ##SECURE_HSTS_SECONDS = 3600            # HSTS（HTTP Strict Transport Security）の設定
+
+
